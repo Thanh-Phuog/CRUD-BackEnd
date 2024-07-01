@@ -14,6 +14,56 @@ const isValidPassword = (password) => {
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$/;
   return passwordRegex.test(password);
 };
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *         - password
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the user
+ *         name:
+ *           type: string
+ *           description: The name of the user
+ *         email:
+ *           type: string
+ *           description: The email of the user
+ *         password:
+ *           type: string
+ *           description: The password of the user
+ *       example:
+ *         id: 60d0fe4f5311236168a109ca
+ *         name: John Doe
+ *         email: johndoe@example.com
+ *         password: Password123!
+ */
+
+/**
+ * @swagger
+ * /create-user:
+ *   post:
+ *     summary: Creates a new user
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: The user was successfully created
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Internal server error
+ */
 //Thêm User
 router.post("/create-user", async (req, res) => {
   const { name, email, password } = req.body;
@@ -58,6 +108,24 @@ router.post("/create-user", async (req, res) => {
       .json({ status: 500, message: "Thêm User thất bại", details: err });
   }
 });
+/**
+ * @swagger
+ * /api/get-all-user:
+ *   get:
+ *     summary: Retrieves a list of users
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal server error
+ */
 //Lấy danh sách User
 router.get("/get-all-user", async (req, res) => {
   try {
