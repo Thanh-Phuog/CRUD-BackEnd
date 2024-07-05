@@ -59,10 +59,10 @@ const isValidPassword = (password) => {
  *     responses:
  *       201:
  *         description: The user was successfully created
- *       400:
- *         description: Bad request
- *       500:
- *         description: Internal server error
+ *      content:
+ *        application/json:
+ *         schema:
+ *          $ref: '#/components/schemas/User'
  */
 //Thêm User
 router.post("/create-user", async (req, res) => {
@@ -110,7 +110,7 @@ router.post("/create-user", async (req, res) => {
 });
 /**
  * @swagger
- * /api/get-all-user:
+ * /get-all-user:
  *   get:
  *     summary: Retrieves a list of users
  *     tags: [User]
@@ -137,6 +137,30 @@ router.get("/get-all-user", async (req, res) => {
       .json({ status: 500, message: "Lỗi truy xuất User", details: err });
   }
 });
+/**
+ * @swagger
+ * /get-user-detail/{id}:
+ *  get:
+ *   summary: Get a user by id
+ *  tags: [User]
+ * parameters:
+ *  - in: path
+ *   name: id
+ * schema:integer
+ * required: true
+ * description: The user id
+ * responses:
+ * 200:
+ * description: The user description by id
+ * content:
+ * application/json:
+ * schema:
+ * $ref: '#/components/schemas/User'
+ * 404:
+ * description: The user was not found
+ * 500:
+ * description: Some server error
+ */
 //Lấy danh sách User theo id
 router.get("/get-user-detail/:id", async (req, res) => {
   const { id } = req.params;
@@ -188,6 +212,37 @@ router.get("/get-user-byname/:name", async (req, res) => {
       .json({ status: 500, message: "Lỗi truy xuất User", details: err });
   }
 });
+/**
+ * @swagger
+ * /update-user/{id}:
+ * put:
+ * summary: Update the user by id
+ * tags: [User]
+ * parameters:
+ * - in: path
+ * name: id
+ * schema:
+ * type: integer
+ * required: true
+ * description: The user id
+ * requestBody:
+ *  required: true
+ * content:
+ * application/json:
+ * schema:
+ * $ref: '#/components/schemas/User'
+ * responses:
+ * 200:
+ * description: The user was updated
+ * content:
+ * application/json:
+ * schema:
+ * $ref: '#/components/schemas/User'
+ * 404:
+ * description: The user was not found
+ * 500:
+ * description: Some error happened
+ */
 //Cập nhật User
 router.put("/update-user/:id", async (req, res) => {
   const { id } = req.params;
