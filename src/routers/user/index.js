@@ -14,6 +14,7 @@ const isValidPassword = (password) => {
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$/;
   return passwordRegex.test(password);
 };
+
 /**
  * @swagger
  * components:
@@ -59,10 +60,10 @@ const isValidPassword = (password) => {
  *     responses:
  *       201:
  *         description: The user was successfully created
- *      content:
- *        application/json:
- *         schema:
- *          $ref: '#/components/schemas/User'
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  */
 //Thêm User
 router.post("/create-user", async (req, res) => {
@@ -108,6 +109,7 @@ router.post("/create-user", async (req, res) => {
       .json({ status: 500, message: "Thêm User thất bại", details: err });
   }
 });
+
 /**
  * @swagger
  * /get-all-user:
@@ -137,29 +139,31 @@ router.get("/get-all-user", async (req, res) => {
       .json({ status: 500, message: "Lỗi truy xuất User", details: err });
   }
 });
+
 /**
  * @swagger
  * /get-user-detail/{id}:
- *  get:
- *   summary: Get a user by id
- *  tags: [User]
- * parameters:
- *  - in: path
- *   name: id
- * schema:integer
- * required: true
- * description: The user id
- * responses:
- * 200:
- * description: The user description by id
- * content:
- * application/json:
- * schema:
- * $ref: '#/components/schemas/User'
- * 404:
- * description: The user was not found
- * 500:
- * description: Some server error
+ *   get:
+ *     summary: Get a user by id
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     responses:
+ *       200:
+ *         description: The user description by id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: Some server error
  */
 //Lấy danh sách User theo id
 router.get("/get-user-detail/:id", async (req, res) => {
@@ -178,6 +182,7 @@ router.get("/get-user-detail/:id", async (req, res) => {
       .json({ status: 500, message: "Lỗi truy xuất User", details: err });
   }
 });
+
 //Lấy danh sách User theo email
 router.get("/get-user-byEmail/:email", async (req, res) => {
   const { email } = req.params;
@@ -195,11 +200,12 @@ router.get("/get-user-byEmail/:email", async (req, res) => {
       .json({ status: 500, message: "Lỗi truy xuất User", details: err });
   }
 });
+
 //Lấy danh sách User theo Name
 router.get("/get-user-byname/:name", async (req, res) => {
-  const { email } = req.params;
+  const { name } = req.params;
   try {
-    const user = await userModel.findOne({ email });
+    const user = await userModel.findOne({ name });
     if (!user) {
       return res
         .status(404)
@@ -212,36 +218,37 @@ router.get("/get-user-byname/:name", async (req, res) => {
       .json({ status: 500, message: "Lỗi truy xuất User", details: err });
   }
 });
+
 /**
  * @swagger
  * /update-user/{id}:
- * put:
- * summary: Update the user by id
- * tags: [User]
- * parameters:
- * - in: path
- * name: id
- * schema:
- * type: integer
- * required: true
- * description: The user id
- * requestBody:
- *  required: true
- * content:
- * application/json:
- * schema:
- * $ref: '#/components/schemas/User'
- * responses:
- * 200:
- * description: The user was updated
- * content:
- * application/json:
- * schema:
- * $ref: '#/components/schemas/User'
- * 404:
- * description: The user was not found
- * 500:
- * description: Some error happened
+ *   put:
+ *     summary: Update the user by id
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The user was updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: Some error happened
  */
 //Cập nhật User
 router.put("/update-user/:id", async (req, res) => {
@@ -273,13 +280,35 @@ router.put("/update-user/:id", async (req, res) => {
     editUser.password = password || editUser.password;
     await editUser.save();
 
-    res.status(201).json({ status: 201, message: "Cập nhật User thành công" });
+    res.status(200).json({ status: 200, message: "Cập nhật User thành công" });
   } catch (err) {
     res
       .status(500)
-      .json({ status: 500, message: "Cập nhật User thất bạc", details: err });
+      .json({ status: 500, message: "Cập nhật User thất bại", details: err });
   }
 });
+
+/**
+ * @swagger
+ * /delete-user/{id}:
+ *   delete:
+ *     summary: Delete a user by id
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     responses:
+ *       200:
+ *         description: The user was successfully deleted
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: Some server error
+ */
 //Xóa User
 router.delete("/delete/:id", async (req, res) => {
   const { id } = req.params;
@@ -293,13 +322,42 @@ router.delete("/delete/:id", async (req, res) => {
     }
     await userModel.findByIdAndDelete(id);
     await postModel.deleteMany({ userId: id });
-    res.status(201).json({ status: 201, message: "Xóa User thành công" });
+    res.status(200).json({ status: 200, message: "Xóa User thành công" });
   } catch (err) {
     res
       .status(500)
       .json({ status: 500, message: "Xóa User thất bại", details: err });
   }
 });
+
+/**
+ * @swagger
+ * /get-posts/{id}:
+ *   get:
+ *     summary: Get posts by user id
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user id
+ *     responses:
+ *       200:
+ *         description: The list of posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Post'
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: Some server error
+ */
+//Lấy danh sách bài viết của User
 router.get("/get-posts/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -325,9 +383,10 @@ router.get("/get-posts/:id", async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ status: 500, message: "Lỗi truy xuất User", details: err });
+      .json({ status: 500, message: "Lỗi truy xuất bài viết", details: err });
   }
 });
+
 router.get("/login", async (req, res) => {
   const { email, password } = req.body;
   //Kiểm tra thông tin nhập vào
